@@ -1,0 +1,46 @@
+# Dependencies
+node_modules/
+**/node_modules/
+
+# Environment Variables
+.env
+.env.local
+.env.*.local
+**/.env
+**/.env.local
+
+# Build Outputs
+dist/
+dist-ssr/
+.output/
+.vinxi/
+build/
+out/
+.next/
+
+# Logs and Debug
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# IDE and System Files
+.vscode/
+.idea/
+.DS_Store
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Project Specific
+.tanstack/
+.nitro/
+.wrangler/
+backend/scratch/
+backend/test_*.js
+**/scratch/
+**/bun.lockb
