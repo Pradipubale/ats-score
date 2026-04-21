@@ -20,13 +20,13 @@ services:
         sync: false
 
   # Frontend Static Site
-  - type: static
+  - type: web
     name: ats-score-frontend
-    runtime: static
+    runtime: node
     plan: free
     rootDir: ats-resume-optimizer
     buildCommand: npm install && npm run build
-    publishDir: dist/client
+    startCommand: npm start
     envVars:
       - key: VITE_API_URL
         value: https://ats-score-l0or.onrender.com/api
