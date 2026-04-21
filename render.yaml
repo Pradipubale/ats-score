@@ -29,7 +29,7 @@ services:
     publishDir: dist
     envVars:
       - key: VITE_API_URL
-        value: https://ats-score-backend.onrender.com/api
+        value: https://ats-score-l0or.onrender.com/api
     headers:
       - path: /*
         name: Cache-Control
