@@ -26,7 +26,7 @@ services:
     plan: free
     rootDir: ats-resume-optimizer
     buildCommand: npm install && npm run build
-    publishDir: dist
+    publishDir: dist/client
     envVars:
       - key: VITE_API_URL
         value: https://ats-score-l0or.onrender.com/api
