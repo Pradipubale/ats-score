@@ -12,6 +12,7 @@ type ResumeState = {
   remove: (token: string, id: string) => Promise<void>;
   scanResume: (token: string, id: string | null, data: ResumeData, role: string, jd?: string) => Promise<any>;
   get: (id: string) => (Resume & { atsScore?: number }) | undefined;
+  clearResumes: () => void;
 };
 
 import { persist } from "zustand/middleware";
@@ -68,7 +69,8 @@ export const useResumes = create<ResumeState>()(
       return;
     }
     try {
-      const res = await fetch(`${API_URL}/resumes/${id}`, {
+      const dbId = id || (patch as any)._id;
+      const res = await fetch(`${API_URL}/resumes/${dbId}`, {
         method: "PUT",
         headers: { 
           "Content-Type": "application/json",
@@ -79,7 +81,7 @@ export const useResumes = create<ResumeState>()(
       if (res.ok) {
         const updated = await res.json();
         set((s) => ({
-          resumes: s.resumes.map((r) => (r.id === id ? updated : r)),
+          resumes: s.resumes.map((r) => (r.id === id || (r as any)._id === id ? updated : r)),
         }));
       }
     } catch (err) {
@@ -129,4 +131,5 @@ export const useResumes = create<ResumeState>()(
     return null;
   },
   get: (id) => get().resumes.find((r) => r.id === id || (r as any)._id === id),
+  clearResumes: () => set({ resumes: [] }),
 }), { name: "resumeats-resumes" }));

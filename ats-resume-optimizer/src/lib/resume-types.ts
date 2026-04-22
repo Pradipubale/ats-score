@@ -41,12 +41,14 @@ export type ResumeData = {
 
 export type Resume = {
   id: string;
+  _id?: string; // For MongoDB compatibility
   userId: string;
   name: string;
   templateId: string;
   data: ResumeData;
-  updatedAt: number;
-  versions: { at: number; data: ResumeData }[];
+  updatedAt: number | string;
+  atsScore?: number;
+  versions: { at: number | string; data: ResumeData }[];
 };
 
 export const emptyResume = (): ResumeData => ({
