@@ -1,12 +1,12 @@
 [build]
   base = "ats-resume-optimizer"
-  command = "npm run build"
-  publish = "dist/client"
+  command = "NITRO_PRESET=netlify npm run build"
+  publish = ".output/public"
 
 [build.environment]
   NODE_VERSION = "20"
 
 [[redirects]]
   from = "/*"
-  to = "/index.html"
+  to = "/.netlify/functions/server"
   status = 200

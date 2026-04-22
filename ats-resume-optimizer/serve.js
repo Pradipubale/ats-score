@@ -11,9 +11,58 @@ const app = express();
 // 1. Serve static assets
 app.use(express.static(join(__dirname, 'dist/client')));
 
-// 2. Handle SSR requests - the handler is a Node-compatible listener
-app.all('*', (req, res) => {
-  handler(req, res);
+// 2. Handle SSR requests - with robustness for different build outputs
+app.all('*', async (req, res) => {
+  try {
+    // Determine the full URL for the Fetch Request
+    const protocol = req.protocol || (req.headers['x-forwarded-proto'] === 'https' ? 'https' : 'http');
+    const host = req.get('host');
+    const url = new URL(req.originalUrl || req.url, `${protocol}://${host}`);
+
+    console.log(`[SSR] Handling request: ${req.method} ${url.pathname}`);
+
+    // If handler is a standard Node middleware/function
+    if (typeof handler === 'function') {
+      return handler(req, res);
+    }
+
+    // If handler is an object with a fetch method (common for Nitro/TanStack Start worker output)
+    if (handler && typeof handler.fetch === 'function') {
+      const request = new Request(url.toString(), {
+        method: req.method,
+        headers: req.headers,
+        body: ['GET', 'HEAD'].includes(req.method) ? undefined : req,
+        // @ts-ignore
+        duplex: 'half',
+      });
+
+      const response = await handler.fetch(request);
+
+      // Set status and headers
+      res.status(response.status);
+      response.headers.forEach((value, key) => {
+        res.setHeader(key, value);
+      });
+
+      // Stream the body if it exists
+      if (response.body) {
+        const reader = response.body.getReader();
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          res.write(value);
+        }
+      }
+      return res.end();
+    }
+
+    throw new Error('No valid SSR handler found. Check dist/server/index.js');
+  } catch (err) {
+    console.error('❌ SSR Error:', err);
+    if (!res.headersSent) {
+      res.status(500).send(`Internal Server Error: ${err.message}`);
+    }
+  }
 });
 
 const port = process.env.PORT || 3000;
